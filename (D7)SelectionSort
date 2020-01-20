@@ -1,0 +1,43 @@
+.globl _start
+
+.data
+   arr: .long 6, 3, 8, 1, 2, 9, 7, 5
+   end_arr: 
+.equ size, (end_arr - arr)/4
+
+.text
+ssort:
+# on stack parameter passing
+   mov 4(%ESP), %EBX # array address
+   mov 8(%ESP), %ECX # size (num of items)
+   
+   lea -4(%EBX, %ECX, 4), %ECX # change the size to the address of the last item
+while_outer:
+   cmp %ECX, %EBX
+   jge end_while_outer
+   mov %EBX, %EDI    # address of the best array item
+   mov (%EDI), %EAX  # value of the best array item
+   lea 4(%EBX), %ESI # address of the current array item
+while_inner:
+   cmp %ECX, %ESI    # check the end of array 
+   jg end_while_inner
+   cmp %EAX, (%ESI)
+   jge end_if
+   mov %ESI, %EDI    # address of the best array item
+   mov (%EDI), %EAX  # value of the best array item
+end_if:
+   add $4, %ESI
+   jmp while_inner
+end_while_inner:
+   xchg %EAX, (%EBX)
+   mov  %EAX, (%EDI)
+   add $4, %EBX
+   jmp while_outer
+end_while_outer:
+   ret $8
+
+_start:
+   pushl $size
+   pushl $arr
+   call ssort
+   nop
